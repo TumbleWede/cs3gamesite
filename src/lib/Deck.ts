@@ -2,6 +2,7 @@
 export interface CardData { rank: number, suit: string } // This part written by me though cause I actually understand what this code is doing
 export class Deck {
 	public cards: CardData[];
+	public nullCard: CardData = { rank: -1, suit: "" };
 	private currentIndex: number;
 
 	constructor() {
@@ -31,9 +32,9 @@ export class Deck {
 	}
 
 	// Return the next card from the deck (without duplicates)
-	public drawNextCard(): CardData | null {
+	public drawNextCard(): CardData {
 		if (this.currentIndex >= this.cards.length) {
-			return null; // No more cards in the deck
+			return this.nullCard; // No more cards in the deck
 		}
 		return this.cards[this.currentIndex++];
 	}

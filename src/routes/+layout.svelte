@@ -8,6 +8,7 @@
 <nav>
 	<NavButton to="/" text="Home" />
 	<NavButton to="blackjack" text="Blackjack" />
+	<NavButton to="highcard" text="High Card" />
 </nav>
 
 <div class="container">
@@ -16,7 +17,7 @@
 
 <style>
 	nav {
-		width: 250px;
+		width: 100px;
 		height: 100vh;
 		background: linear-gradient(180deg, rgb(5, 39, 103) 0%, rgb(6, 71, 18) 80%);
 	}
