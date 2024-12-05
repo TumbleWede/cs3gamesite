@@ -9,6 +9,7 @@
 	<NavButton to="/" text="Home" />
 	<NavButton to="blackjack" text="Blackjack" />
 	<NavButton to="highcard" text="High Card" />
+	<NavButton to="slotmachine" text="Slot Machine" />
 </nav>
 
 <div class="container">

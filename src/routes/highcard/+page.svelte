@@ -73,8 +73,8 @@
 	}
 
 	#gameover-text {
-        font-weight: bold;
+		font-weight: bold;
 		color: white;
 		-webkit-text-stroke: 2px black;
-    }
+	}
 </style>
