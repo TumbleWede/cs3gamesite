@@ -1,3 +1,7 @@
+# Note to Mr. Patton:
+This project runs on Node.JS and SvelteKit, so you need to be able to run this on a computer not blocked by the infamous Frisco Firewall™
+just type `npm run dev` to start the server and join the localhost
+
 # sv
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).

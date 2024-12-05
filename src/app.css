@@ -1,0 +1,19 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+	text-align: center;
+	display: flex;
+	width: 100vw;
+}
+
+#game {
+	max-width: 1000px;
+	max-height: 800px;
+	border: 1px solid grey;
+	aspect-ratio: 1.25;
+	margin: auto;
+	border-radius: 4px;
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+	position: relative;
+}
