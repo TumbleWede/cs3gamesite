@@ -16,6 +16,7 @@
 		<NavButton to="blackjack" text="Blackjack" />
 		<NavButton to="highcard" text="High Card" />
 		<NavButton to="slotmachine" text="Slot Machine" />
+		<NavButton to="keno" text="Keno" />
 	</div>
 	<div id="navstats">
 		<p style="font-size: 18px;">{playerData.username} </p>

@@ -14,15 +14,10 @@
 	let gameOverText = $state("");
 	let dealerScore = $state(0), youScore = $state(0);
 
-	/*onMount(() => {
-		dealerScore += getValue(cardData[1].rank, false);
-		youScore += getValue(cardData[3].rank, true);
-	});*/
-
 	// You = true, dealer = false
 	function getValue(rank: number, turn: boolean): number {
 		if (rank > 1) return Math.min(rank, 10); // Do not exceed 10
-		return (turn ? dealerScore : youScore) > 10 ? 1 : 11;
+		return (turn ? dealerScore : youScore) >= 10 ? 1 : 11;
 	}
 	
 	function hit() {
@@ -66,6 +61,7 @@
 		dealerScore = getValue(cardData[1].rank, false);
 		gameOver = false;
 		gameOverText = "Playing";
+		if (youScore == 21) stand();
 	}
 </script>
 
@@ -80,8 +76,8 @@
 	<button style="top: 45%; left: 50%;" onclick={hit} disabled={gameOver ? true : null}>Hit</button>
 	<button style="top: 55%; left: 50%;" onclick={stand} disabled={gameOver ? true : null}>Stand</button>
 	{#if gameOver}<p id="gameover-text" style="top: 50%; left: 20%; font-size: 60px;">{gameOverText}</p>{/if}
-	<button style="top: 50%; left: 80%;" onclick={restart} disabled={(gameOver && playerData.coins >= 10) ? null : true}>Play Again</button>
 	<p style="top: 45%; left: 80%;">10 coins required</p>
+	<button style="top: 50%; left: 80%;" onclick={restart} disabled={(gameOver && playerData.coins >= 10) ? null : true}>Play Again</button>
 </div>
 
 <style>

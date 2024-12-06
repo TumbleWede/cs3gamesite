@@ -3,7 +3,7 @@
 	let playerData: UserData = $state();
 	UserData.value.subscribe(value => { playerData = value; });
 
-	const list = ["py", "cpp", "js", "java", "rs"];
+	const list = ["py", "cpp", "js", "java", "rs", "svelte"];
 	let debounce = $state(false);
 	let gameOverText = $state("Let's go gambling!");
 	let indices = $state([
@@ -23,7 +23,7 @@
 		for (let i = 0; i < 30; i++) {
 			for (let j = 0; j < indices.length; j++)
 				if (i < 5 * j + 20)
-				indices[j] = (indices[j] + j + 1) % list.length;
+				indices[j] = (indices[j] + 1) % list.length;
 			await new Promise(resolve => setTimeout(resolve, i * 5 + 10));
 		}
 
@@ -35,10 +35,6 @@
 		debounce = false;
 	}
 </script>
-
-<svelte:head>
-	<link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
-</svelte:head>
 
 <h1>Slot Machine</h1>
 <div id="game">
