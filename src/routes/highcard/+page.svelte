@@ -4,12 +4,15 @@
 	import { UserData } from "$lib/UserData";
 	import { onMount } from "svelte";
 
+	let playerData: UserData = $state();
+	UserData.value.subscribe(value => { playerData = value; });
+
 	const deck = new Deck();
 	let cardDivs: Card[] = [];
-	let cardData: CardData[] = [deck.drawNextCard(), deck.drawNextCard()];
-	let dealerScore = 0, youScore = 0;
-	let dealt = false;
-	let gameOverText = "Your card is...";
+	let cardData: CardData[] = $state([deck.drawNextCard(), deck.drawNextCard()]);
+	let dealerScore = $state(0), youScore = $state(0);
+	let dealt = $state(false);
+	let gameOverText = $state("Your card is...");
 
 	onMount(() => {
 		dealerScore = cardData[0].rank;
@@ -45,8 +48,8 @@
 <div id="game">
 	<Card bind:this={cardDivs[0]} suit={cardData[0].suit} rank={cardData[0].rank} style="top: 50%; left: 20%;" face={dealt} />
 	<Card bind:this={cardDivs[1]} suit={cardData[1].suit} rank={cardData[1].rank} style="top: 50%; left: 80%;" face={dealt} />
-	<p style="top: 30%; left: 20%;">Dealer</p>
-	<p style="top: 30%; left: 80%;">You</p>
+	<p style="top: 30%; left: 20%;">CPU</p>
+	<p style="top: 30%; left: 80%;">{playerData.username}</p>
 	{#if dealt}<p style="top: 70%; left: 20%;">{dealerScore}</p>{/if}
 	{#if dealt}<p style="top: 70%; left: 80%;">{youScore}</p>{/if}
 	<button style="top: 40%; left: 50%;" onclick={() => draw("h")} disabled={dealt ? true : null}>Higher</button>
