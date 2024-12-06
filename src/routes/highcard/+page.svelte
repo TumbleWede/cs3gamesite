@@ -1,10 +1,11 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte";
 	import { Deck, type CardData } from "$lib/Deck";
-	import { afterUpdate, onMount } from "svelte";
+	import { UserData } from "$lib/UserData";
+	import { onMount } from "svelte";
 
 	const deck = new Deck();
-	let cardDivs: HTMLDivElement[] = [];
+	let cardDivs: Card[] = [];
 	let cardData: CardData[] = [deck.drawNextCard(), deck.drawNextCard()];
 	let dealerScore = 0, youScore = 0;
 	let dealt = false;
@@ -22,7 +23,10 @@
 	}
 
 	function draw(guess: string) {
-		if (getResult() == guess) gameOverText = "You Win!";
+		if (getResult() == guess) {
+			gameOverText = "You Win!";
+			UserData.addCoins(10);
+		}
 		else gameOverText = "You Lose!";
 		dealt = true;
 	}
@@ -45,9 +49,9 @@
 	<p style="top: 30%; left: 80%;">You</p>
 	{#if dealt}<p style="top: 70%; left: 20%;">{dealerScore}</p>{/if}
 	{#if dealt}<p style="top: 70%; left: 80%;">{youScore}</p>{/if}
-	<button style="top: 40%; left: 50%;" onclick={() => draw("h")} disabled={dealt ? "disabled" : null}>Higher</button>
-	<button style="top: 50%; left: 50%;" onclick={() => draw("m")} disabled={dealt ? "disabled" : null}>Equal</button>
-	<button style="top: 60%; left: 50%;" onclick={() => draw("l")} disabled={dealt ? "disabled" : null}>Lower</button>
+	<button style="top: 40%; left: 50%;" onclick={() => draw("h")} disabled={dealt ? true : null}>Higher</button>
+	<button style="top: 50%; left: 50%;" onclick={() => draw("m")} disabled={dealt ? true : null}>Equal</button>
+	<button style="top: 60%; left: 50%;" onclick={() => draw("l")} disabled={dealt ? true : null}>Lower</button>
 	<button style="top: 80%; left: 50%;" onclick={restart}>Restart</button>
 	<p id="gameover-text" style="top: 20%; left: 50%; font-size: 60px;">{gameOverText}</p>
 </div>

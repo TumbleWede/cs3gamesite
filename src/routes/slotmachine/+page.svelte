@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { UserData } from "$lib/UserData";
+
 	const list = ["py", "cpp", "js", "java", "rs"];
 	let debounce = false;
 	let gameOverText = "Let's go gambling!";
@@ -11,18 +13,22 @@
 	async function spin() {
 		if (debounce) return;
 		debounce = true;
+		UserData.addCoins(-5);
 		indices[0] = Math.floor(Math.random() * list.length),
 		indices[1] = Math.floor(Math.random() * list.length),
 		indices[2] = Math.floor(Math.random() * list.length)
 
-		for (let i = 0; i < 20; i++) {
+		for (let i = 0; i < 30; i++) {
 			for (let j = 0; j < indices.length; j++)
-				if (i < 5 * j + 10)
-				indices[j] = (indices[j] + 1) % list.length;
-			await new Promise(resolve => setTimeout(resolve, i * 10 + 20));
+				if (i < 5 * j + 20)
+				indices[j] = (indices[j] + j + 1) % list.length;
+			await new Promise(resolve => setTimeout(resolve, i * 5 + 10));
 		}
 
-		gameOverText = (indices[0] === indices[1] && indices[0] === indices[2]) ? "Jackpot!" : "Aw dang it!";
+		if (indices[0] === indices[1] && indices[0] === indices[2]) {
+			gameOverText = "Jackpot!";
+			UserData.addCoins(100);
+		} else gameOverText = "Aw dang it!";
 
 		debounce = false;
 	}
@@ -32,9 +38,9 @@
 	<link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
 </svelte:head>
 
-<h1>High Card</h1>
+<h1>Slot Machine</h1>
 <div id="game">
-	<button style="top: 90%; left: 50%;" onclick={spin} disabled={debounce ? "disabled" : null}>Spin</button>
+	<button style="top: 90%; left: 50%;" onclick={spin} disabled={debounce ? true : null}>Spin</button>
 	<div id="slotmachine">
 		<img id="slot1" src="langs/{list[indices[0]]}.svg" alt={list[indices[0]]} />
 		<img id="slot2" src="langs/{list[indices[1]]}.svg" alt={list[indices[1]]} />
@@ -44,7 +50,6 @@
 </div>
 
 <style>
-
 	#game > button {
 		position: absolute;
 		align-content: center;
@@ -71,7 +76,7 @@
 		display: flex;
 	}
 
-	#slotmachine img, i {
+	#slotmachine img {
 		width: 33.3%;
 		height: 100%;
 		border: 1px solid grey;

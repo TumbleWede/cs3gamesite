@@ -1,6 +1,9 @@
 <script lang="ts">
-	// Make all parameters optional and give default values so that the card cannot 
-	interface Props {
+	import type { HTMLAttributes } from "svelte/elements";
+
+	// Make all parameters optional and give default values so that the card cannot
+	// The extends part is to make the typescript compiler happy for allowing ...others attributes
+	interface Props extends HTMLAttributes<HTMLDivElement> {
 		suit?: string,
 		rank?: number,
 		invert?: boolean,

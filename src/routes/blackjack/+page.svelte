@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte";
 	import { Deck, type CardData } from "$lib/Deck";
-	import { afterUpdate, onMount } from "svelte";
+	import { onMount } from "svelte";
 
 	const deck = new Deck();
-	let cardDivs: HTMLDivElement[] = [];
+	let cardDivs: Card[] = [];
 	let cardData: CardData[] = [deck.drawNextCard(), deck.drawNextCard(), deck.drawNextCard(), deck.drawNextCard()];
 	let gameOver = false;
 	let dealerScore = 0, youScore = 0;
@@ -51,9 +51,9 @@
 	<Card bind:this={cardDivs[3]} suit={cardData[3].suit} rank={cardData[3].rank} style="top: 80%; left: 62.5%;" />
 	<p style="top: 3%; left: 50%;">Dealer ({dealerScore})</p>
 	<p style="top: 97%; left: 50%;">You ({youScore})</p>
-	<button style="top: 45%; left: 50%;" onclick={hit} disabled={gameOver ? "disabled" : null}>Hit</button>
-	<button style="top: 55%; left: 50%;" onclick={stand} disabled={gameOver ? "disabled" : null}>Stand</button>
-	<p id="gameover-text" style="top: 50%; left: 20%; font-size: 60px;" hidden={gameOver ? null : "hidden"}>Game Over</p>
+	<button style="top: 45%; left: 50%;" onclick={hit} disabled={gameOver ? true : null}>Hit</button>
+	<button style="top: 55%; left: 50%;" onclick={stand} disabled={gameOver ? true : null}>Stand</button>
+	<p id="gameover-text" style="top: 50%; left: 20%; font-size: 60px;" hidden={gameOver ? null : true}>Game Over</p>
 	<button style="top: 50%; left: 80%;" onclick={restart}>Play Again</button>
 </div>
 
