@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { UserData } from "$lib/UserData";
+	let playerData: UserData = $state();
+	UserData.value.subscribe(value => { playerData = value; });
 
 	const list = ["py", "cpp", "js", "java", "rs"];
-	let debounce = false;
-	let gameOverText = "Let's go gambling!";
-	let indices = [
+	let debounce = $state(false);
+	let gameOverText = $state("Let's go gambling!");
+	let indices = $state([
 		Math.floor(Math.random() * list.length),
 		Math.floor(Math.random() * list.length),
 		Math.floor(Math.random() * list.length)
-	];
+	]);
 
 	async function spin() {
 		if (debounce) return;
@@ -40,7 +42,8 @@
 
 <h1>Slot Machine</h1>
 <div id="game">
-	<button style="top: 90%; left: 50%;" onclick={spin} disabled={debounce ? true : null}>Spin</button>
+	<p id="fee">Costs 5 coins</p>
+	<button style="top: 90%; left: 50%;" onclick={spin} disabled={(debounce || playerData.coins < 5) ? true : null}>Spin</button>
 	<div id="slotmachine">
 		<img id="slot1" src="langs/{list[indices[0]]}.svg" alt={list[indices[0]]} />
 		<img id="slot2" src="langs/{list[indices[1]]}.svg" alt={list[indices[1]]} />
@@ -50,7 +53,7 @@
 </div>
 
 <style>
-	#game > button {
+	#game > button, #fee {
 		position: absolute;
 		align-content: center;
 		margin: 0;
@@ -87,5 +90,11 @@
 		font-weight: bold;
 		color: white;
 		-webkit-text-stroke: 2px black;
+	}
+
+	#fee {
+		font-size: 24px;
+		left: 50%;
+		top: 80%;
 	}
 </style>

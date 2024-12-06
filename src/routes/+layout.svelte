@@ -5,16 +5,22 @@
 
 	let { children } = $props();
 	
-	let playerData = $state();
+	// playerData will be a reactive version of UserData for svelte components
+	let playerData: UserData = $state();
 	UserData.value.subscribe(value => { playerData = value; });
 </script>
 
 <nav>
-	<NavButton to="/" text="Home" />
-	<NavButton to="blackjack" text="Blackjack" />
-	<NavButton to="highcard" text="High Card" />
-	<NavButton to="slotmachine" text="Slot Machine" />
-	<p>Coins: {playerData.coins} </p>
+	<div id="navbuttons">
+		<NavButton to="/" text="Home" />
+		<NavButton to="blackjack" text="Blackjack" />
+		<NavButton to="highcard" text="High Card" />
+		<NavButton to="slotmachine" text="Slot Machine" />
+	</div>
+	<div id="navstats">
+		<p style="font-size: 18px;">{playerData.username} </p>
+		<p>Coins: {playerData.coins} </p>
+	</div>
 </nav>
 
 <div class="container">
@@ -26,6 +32,7 @@
 		width: 200px;
 		height: 100vh;
 		background: linear-gradient(180deg, rgb(5, 39, 103) 0%, rgb(6, 71, 18) 80%);
+		position: static;
 	}
 
 	.container {
@@ -35,6 +42,14 @@
 
 	p {
 		color: white;
-		font-size: 32px;
+		font-size: 24px;
+		margin: 10px 0;
+		width: 200px;
+		font-family: monospace;
+	}
+
+	#navstats {
+		position: absolute;
+		bottom: 0;
 	}
 </style>

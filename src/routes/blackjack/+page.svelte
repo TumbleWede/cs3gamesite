@@ -1,13 +1,15 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte";
 	import { Deck, type CardData } from "$lib/Deck";
+	import { UserData } from "$lib/UserData";
 	import { onMount } from "svelte";
 
 	const deck = new Deck();
 	let cardDivs: Card[] = [];
-	let cardData: CardData[] = [deck.drawNextCard(), deck.drawNextCard(), deck.drawNextCard(), deck.drawNextCard()];
-	let gameOver = false;
-	let dealerScore = 0, youScore = 0;
+	let cardData: CardData[] = $state([deck.drawNextCard(), deck.drawNextCard(), deck.drawNextCard(), deck.drawNextCard()]);
+	let gameOver = $state(false);
+	let gameOverText = $state("");
+	let dealerScore = $state(0), youScore = $state(0);
 
 	onMount(() => {
 		dealerScore += getValue(cardData[1].rank, false);
@@ -30,7 +32,23 @@
 
 	function stand() {
 		gameOver = true;
+
 		dealerScore += getValue(cardData[0].rank, false);
+		
+		if (youScore == dealerScore) {
+			gameOverText = "Tie!";
+		}  else if (dealerScore == 21 || youScore > 21) {
+			gameOverText = "You Lose!";
+			UserData.addCoins(-10);
+		} else if (youScore == 21 || dealerScore > 21) {
+			gameOverText = "You Win!";
+			UserData.addCoins(10);
+		} else if (youScore > dealerScore) {
+			gameOverText = "You Win!";
+			UserData.addCoins(10);
+		} else {
+			gameOverText = "You Lose!";
+		}
 	}
 
 	function restart() {
@@ -44,7 +62,6 @@
 
 <h1>Blackjack</h1>
 <div id="game">
-	<Card id="deck" face={false} style="top: 50%; left: 50%;" />
 	<Card bind:this={cardDivs[0]} suit={cardData[0].suit} rank={cardData[0].rank} style="top: 20%; left: 37.5%;" face={gameOver} />
 	<Card bind:this={cardDivs[1]} suit={cardData[1].suit} rank={cardData[1].rank} style="top: 20%; left: 62.5%;" />
 	<Card bind:this={cardDivs[2]} suit={cardData[2].suit} rank={cardData[2].rank} style="top: 80%; left: 37.5%;" />
@@ -53,7 +70,7 @@
 	<p style="top: 97%; left: 50%;">You ({youScore})</p>
 	<button style="top: 45%; left: 50%;" onclick={hit} disabled={gameOver ? true : null}>Hit</button>
 	<button style="top: 55%; left: 50%;" onclick={stand} disabled={gameOver ? true : null}>Stand</button>
-	<p id="gameover-text" style="top: 50%; left: 20%; font-size: 60px;" hidden={gameOver ? null : true}>Game Over</p>
+	{#if gameOver}<p id="gameover-text" style="top: 50%; left: 20%; font-size: 60px;">{gameOverText}</p>{/if}
 	<button style="top: 50%; left: 80%;" onclick={restart}>Play Again</button>
 </div>
 

@@ -1,5 +1,9 @@
 import { writable } from "svelte/store";
 
+export interface UserData { // To keep the ts compiler happy
+	username: string,
+	coins: number
+}
 export class UserData {
 	// Throw error to prevent server from accessing this class; localStorage is only accessible to the client.
 	constructor() {
