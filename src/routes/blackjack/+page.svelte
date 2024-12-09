@@ -51,6 +51,7 @@
 			UserData.addCoins(10);
 		} else {
 			gameOverText = "You Lose!";
+			UserData.addCoins(-10);
 		}
 	}
 
@@ -101,8 +102,8 @@
 	}
 
 	#gameover-text {
-        font-weight: bold;
+		font-weight: bold;
 		color: white;
 		-webkit-text-stroke: 2px black;
-    }
+	}
 </style>
