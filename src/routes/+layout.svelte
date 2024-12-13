@@ -1,13 +1,13 @@
 <script lang="ts">
 	import NavButton from "$lib/components/NavButton.svelte";
-	import { UserData } from "$lib/UserData";
+	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
 	import "../app.css";
 
 	let { children } = $props();
 	
 	// playerData will be a reactive version of UserData for svelte components
 	let playerData: UserData = $state();
-	UserData.value.subscribe(value => { playerData = value; });
+	userdataWritable.subscribe(value => { playerData = value; });
 </script>
 
 <nav>

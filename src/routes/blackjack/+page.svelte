@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte";
 	import { Deck, type CardData } from "$lib/Deck";
-	import { UserData } from "$lib/UserData";
+	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
 	import { onMount } from "svelte";
 
 	let playerData: UserData = $state();
-	UserData.value.subscribe(value => { playerData = value; });
+	userdataWritable.subscribe(value => { playerData = value; });
 
 	const deck = new Deck();
 	let cardDivs: Card[] = [];
@@ -42,16 +42,16 @@
 			gameOverText = "Tie!";
 		}  else if (dealerScore == 21 || youScore > 21) {
 			gameOverText = "You Lose!";
-			UserData.addCoins(-10);
+			addCoins(-10);
 		} else if (youScore == 21 || dealerScore > 21) {
 			gameOverText = "You Win!";
-			UserData.addCoins(10);
+			addCoins(10);
 		} else if (youScore > dealerScore) {
 			gameOverText = "You Win!";
-			UserData.addCoins(10);
+			addCoins(10);
 		} else {
 			gameOverText = "You Lose!";
-			UserData.addCoins(-10);
+			addCoins(-10);
 		}
 	}
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { UserData } from "$lib/UserData";
+	import { addCoins, setUsername, type UserData, userdata, userdataWritable } from "$lib/UserData";
 
 	let playerData: UserData = $state();
-	UserData.value.subscribe(value => { playerData = value; });
+	userdataWritable.subscribe(value => { playerData = value; });
 
 	let input: HTMLInputElement;
 	let invalidMessage = $state("");
@@ -20,7 +20,7 @@
 			if (input.value.length > 20) throw new Error("must be less than 20 characters");
 			if (input.value.indexOf(' ') != -1) throw new Error("cannot contain spaces");
 			if (!isAlphanumeric(input.value)) throw new Error("must only contain a-z, A-Z, 0-9, and '_'");
-			UserData.username = input.value;
+			setUsername(input.value);
 			invalidMessage = "Username successfully changed!";
 			invalidColor = "green";
 		} catch (e) {

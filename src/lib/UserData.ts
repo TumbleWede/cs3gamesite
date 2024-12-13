@@ -1,52 +1,30 @@
+import { browser } from "$app/environment";
 import { writable } from "svelte/store";
 
 export interface UserData { // To keep the ts compiler happy
 	username: string,
 	coins: number
 }
-export class UserData {
-	// Throw error to prevent server from accessing this class; localStorage is only accessible to the client.
-	constructor() {
-		if (typeof window === "undefined") throw new Error("This class can only be used in the browser.");
-	}
-	
-	private static _username: string = "Guest";
-	private static _coins: number = 0;
 
-	public static value = writable({
-		username: UserData._username,
-		coins: UserData._coins
-	})
+// Quick access variables so we don't have to access users
+export let userdata: UserData[] = (() => browser ? (JSON.parse(localStorage.getItem("userdata") || '[{"username":"Guest","coins":0}]' )) : [{username: "Server", coins: 0}])();
+let index = 0;
 
-	private static updateWritable() {
-		UserData.value.set({
-			username: UserData._username,
-			coins: UserData._coins
-		})
-	}
+export let userdataWritable = writable(userdata[index]); // Allows userdata to be reactive
 
-	public static get username(): string { return UserData._username; }
-	public static get coins(): number { return UserData._coins; }
-
-	public static set username(value: string) {
-		UserData._username = value;
-		localStorage.setItem("username", value);
-		UserData.updateWritable();
-	}
-
-	public static set coins(value: number) {
-		UserData._coins = value;
-		localStorage.setItem("coins", value.toString());
-		UserData.updateWritable();
-	}
-	public static addCoins(value: number) {
-		UserData._coins += value;
-		localStorage.setItem("coins", UserData._coins.toString());
-		UserData.updateWritable();
-	}
+export function setUsername(value: string) {
+	userdata[index].username = value;
+	localStorage.setItem("userdata", JSON.stringify(userdata));
+	userdataWritable.set(userdata[index]);
 }
 
-if (typeof window != "undefined") {
-	UserData.username = localStorage.getItem("username") || "Guest";
-	UserData.coins = parseInt(localStorage.getItem("coins")) || 0;
+export function setCoins(value: number) {
+	userdata[index].coins = value;
+	localStorage.setItem("userdata", JSON.stringify(userdata));
+	userdataWritable.set(userdata[index]);
+}
+export function addCoins(value: number) {
+	userdata[index].coins += value;
+	localStorage.setItem("userdata", JSON.stringify(userdata));
+	userdataWritable.set(userdata[index]);
 }

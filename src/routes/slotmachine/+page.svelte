@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { UserData } from "$lib/UserData";
+	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
 	let playerData: UserData = $state();
-	UserData.value.subscribe(value => { playerData = value; });
+	userdataWritable.subscribe(value => { playerData = value; });
 
 	const list = ["py", "cpp", "js", "java", "rs", "svelte"];
 	let debounce = $state(false);
@@ -15,7 +15,7 @@
 	async function spin() {
 		if (debounce) return;
 		debounce = true;
-		UserData.addCoins(-5);
+		addCoins(-5);
 		indices[0] = Math.floor(Math.random() * list.length),
 		indices[1] = Math.floor(Math.random() * list.length),
 		indices[2] = Math.floor(Math.random() * list.length)
@@ -24,13 +24,13 @@
 			for (let j = 0; j < indices.length; j++)
 				if (i < 5 * j + 20)
 				indices[j] = (indices[j] + 1) % list.length;
-			await new Promise(resolve => setTimeout(resolve, i * 5 + 10));
+			await new Promise(resolve => setTimeout(resolve, i * 5 + 10)); // Yields the script for a small interval of time
 		}
 
 		if (indices[0] === indices[1] && indices[0] === indices[2]) {
 			gameOverText = "Jackpot!";
-			UserData.addCoins(100);
-		} else gameOverText = "Aw dang it!";
+			addCoins(100);
+		} else gameOverText = "Aw, dang it!";
 
 		debounce = false;
 	}
