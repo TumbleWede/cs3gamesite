@@ -7,24 +7,28 @@ export interface UserData { // To keep the ts compiler happy
 }
 
 // Quick access variables so we don't have to access users
-export let userdata: UserData[] = (() => browser ? (JSON.parse(localStorage.getItem("userdata") || '[{"username":"Guest","coins":0}]' )) : [{username: "Server", coins: 0}])();
-let index = 0;
+export let playerIndex = 0
+export let userdata: UserData[] = [{username: "Server", coins: 0}];
+export let userdataWritable = writable(userdata); // Allows userdata to be reactive
 
-export let userdataWritable = writable(userdata[index]); // Allows userdata to be reactive
+if (browser) {
+	userdata = JSON.parse(localStorage.getItem("userdata") || '[{"username":"Guest","coins":0}]');
+	userdataWritable.set(userdata);
+}
 
 export function setUsername(value: string) {
-	userdata[index].username = value;
+	userdata[playerIndex].username = value;
 	localStorage.setItem("userdata", JSON.stringify(userdata));
-	userdataWritable.set(userdata[index]);
+	userdataWritable.set(userdata);
 }
 
 export function setCoins(value: number) {
-	userdata[index].coins = value;
+	userdata[playerIndex].coins = value;
 	localStorage.setItem("userdata", JSON.stringify(userdata));
-	userdataWritable.set(userdata[index]);
+	userdataWritable.set(userdata);
 }
 export function addCoins(value: number) {
-	userdata[index].coins += value;
+	userdata[playerIndex].coins += value;
 	localStorage.setItem("userdata", JSON.stringify(userdata));
-	userdataWritable.set(userdata[index]);
+	userdataWritable.set(userdata);
 }
