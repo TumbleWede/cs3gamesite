@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte";
 	import { Deck, type CardData } from "$lib/Deck";
-	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
+	import { UserData } from "$lib/UserData";
 	import { onMount } from "svelte";
 
-	let playerData: UserData = $state();
-	userdataWritable.subscribe(value => { playerData = value; });
+	let playerData: UserData[] = $state();
+	UserData.subscribe(value => { playerData = value; });
 
 	const deck = new Deck();
 	let cardDivs: Card[] = [];
@@ -28,7 +28,7 @@
 	function draw(guess: string) {
 		if (getResult() == guess) {
 			gameOverText = "You Win!";
-			addCoins(10);
+			UserData.addCoins(10);
 		}
 		else gameOverText = "You Lose!";
 		dealt = true;
@@ -49,7 +49,7 @@
 	<Card bind:this={cardDivs[0]} suit={cardData[0].suit} rank={cardData[0].rank} style="top: 50%; left: 20%;" face={dealt} />
 	<Card bind:this={cardDivs[1]} suit={cardData[1].suit} rank={cardData[1].rank} style="top: 50%; left: 80%;" face={dealt} />
 	<p style="top: 30%; left: 20%;">CPU</p>
-	<p style="top: 30%; left: 80%;">{playerData.username}</p>
+	<p style="top: 30%; left: 80%;">{playerData[0].username}</p>
 	{#if dealt}<p style="top: 70%; left: 20%;">{dealerScore}</p>{/if}
 	{#if dealt}<p style="top: 70%; left: 80%;">{youScore}</p>{/if}
 	<button style="top: 40%; left: 50%;" onclick={() => draw("h")} disabled={dealt ? true : null}>Higher</button>

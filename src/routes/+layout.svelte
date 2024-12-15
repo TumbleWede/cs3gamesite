@@ -1,13 +1,13 @@
 <script lang="ts">
 	import NavButton from "$lib/components/NavButton.svelte";
-	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
+	import { UserData } from "$lib/UserData";
 	import "../app.css";
 
 	let { children } = $props();
 	
 	// playerData will be a reactive version of UserData for svelte components
-	let playerData: UserData = $state();
-	userdataWritable.subscribe(value => { playerData = value; });
+	let playerData: UserData[] = $state();
+	UserData.subscribe(value => { playerData = value; });
 </script>
 
 <nav>
@@ -17,10 +17,11 @@
 		<NavButton to="highcard" text="High Card" />
 		<NavButton to="slotmachine" text="Slot Machine" />
 		<NavButton to="keno" text="Keno" />
+		<NavButton to="crazy8" text="Crazy Eights" />
 	</div>
 	<div id="navstats">
-		<p style="font-size: 18px;">{playerData.username} </p>
-		<p>Coins: {playerData.coins} </p>
+		<p style="font-size: 18px;">{playerData[0].username} </p>
+		<p>Coins: {playerData[0].coins} </p>
 	</div>
 </nav>
 

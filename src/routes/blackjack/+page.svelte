@@ -1,11 +1,10 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte";
 	import { Deck, type CardData } from "$lib/Deck";
-	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
-	import { onMount } from "svelte";
+	import { UserData } from "$lib/UserData";
 
-	let playerData: UserData = $state();
-	userdataWritable.subscribe(value => { playerData = value; });
+	let playerData: UserData[] = $state();
+	UserData.subscribe(value => { playerData = value; });
 
 	const deck = new Deck();
 	let cardDivs: Card[] = [];
@@ -42,16 +41,16 @@
 			gameOverText = "Tie!";
 		}  else if (dealerScore == 21 || youScore > 21) {
 			gameOverText = "You Lose!";
-			addCoins(-10);
+			UserData.addCoins(-10);
 		} else if (youScore == 21 || dealerScore > 21) {
 			gameOverText = "You Win!";
-			addCoins(10);
+			UserData.addCoins(10);
 		} else if (youScore > dealerScore) {
 			gameOverText = "You Win!";
-			addCoins(10);
+			UserData.addCoins(10);
 		} else {
 			gameOverText = "You Lose!";
-			addCoins(-10);
+			UserData.addCoins(-10);
 		}
 	}
 
@@ -73,12 +72,12 @@
 	<Card bind:this={cardDivs[2]} suit={cardData[2].suit} rank={cardData[2].rank} style="top: 80%; left: 37.5%;" face={gameOverText != ""} />
 	<Card bind:this={cardDivs[3]} suit={cardData[3].suit} rank={cardData[3].rank} style="top: 80%; left: 62.5%;" face={gameOverText != ""} />
 	<p style="top: 3%; left: 50%;">Dealer ({dealerScore})</p>
-	<p style="top: 97%; left: 50%;">{playerData.username} ({youScore})</p>
+	<p style="top: 97%; left: 50%;">{playerData[0].username} ({youScore})</p>
 	<button style="top: 45%; left: 50%;" onclick={hit} disabled={gameOver ? true : null}>Hit</button>
 	<button style="top: 55%; left: 50%;" onclick={stand} disabled={gameOver ? true : null}>Stand</button>
 	{#if gameOver}<p id="gameover-text" style="top: 50%; left: 20%; font-size: 60px;">{gameOverText}</p>{/if}
 	<p style="top: 45%; left: 80%;">10 coins required</p>
-	<button style="top: 50%; left: 80%;" onclick={restart} disabled={(gameOver && playerData.coins >= 10) ? null : true}>Play Again</button>
+	<button style="top: 50%; left: 80%;" onclick={restart} disabled={(gameOver && playerData[0].coins >= 10) ? null : true}>Play Again</button>
 </div>
 
 <style>

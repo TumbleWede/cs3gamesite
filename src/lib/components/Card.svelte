@@ -41,7 +41,7 @@
 		margin: 0;
 		position: absolute;
 		transform: translate(-50%, -50%);
-		transition: 0.1s;
+		transition: all 0.25s;
 	}
 
 	.card > img {

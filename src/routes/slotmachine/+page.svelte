@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
-	let playerData: UserData = $state();
-	userdataWritable.subscribe(value => { playerData = value; });
+	import { UserData } from "$lib/UserData";
+	let playerData: UserData[] = $state();
+	UserData.subscribe(value => { playerData = value; });
 
 	const list = ["py", "cpp", "js", "java", "rs", "svelte"];
 	let debounce = $state(false);
@@ -15,7 +15,7 @@
 	async function spin() {
 		if (debounce) return;
 		debounce = true;
-		addCoins(-5);
+		UserData.addCoins(-5);
 		indices[0] = Math.floor(Math.random() * list.length),
 		indices[1] = Math.floor(Math.random() * list.length),
 		indices[2] = Math.floor(Math.random() * list.length)
@@ -29,7 +29,7 @@
 
 		if (indices[0] === indices[1] && indices[0] === indices[2]) {
 			gameOverText = "Jackpot!";
-			addCoins(100);
+			UserData.addCoins(100);
 		} else gameOverText = "Aw, dang it!";
 
 		debounce = false;
@@ -39,7 +39,7 @@
 <h1>Slot Machine</h1>
 <div id="game">
 	<p id="fee">Costs 5 coins</p>
-	<button style="top: 90%; left: 50%;" onclick={spin} disabled={(debounce || playerData.coins < 5) ? true : null}>Spin</button>
+	<button style="top: 90%; left: 50%;" onclick={spin} disabled={(debounce || playerData[0].coins < 5) ? true : null}>Spin</button>
 	<div id="slotmachine">
 		<img id="slot1" src="langs/{list[indices[0]]}.svg" alt={list[indices[0]]} />
 		<img id="slot2" src="langs/{list[indices[1]]}.svg" alt={list[indices[1]]} />

@@ -1,9 +1,9 @@
 <script lang="ts">
     import KenoBox from "$lib/components/KenoBox.svelte";
-	import { addCoins, type UserData, userdata, userdataWritable } from "$lib/UserData";
+	import { UserData } from "$lib/UserData";
     import { mount, onMount } from "svelte";
-	let playerData: UserData = $state();
-	userdataWritable.subscribe(value => { playerData = value; });
+	let playerData: UserData[] = $state();
+	UserData.subscribe(value => { playerData = value; });
 
 	let grid: HTMLDivElement;
 	let bet: HTMLInputElement;
@@ -20,7 +20,7 @@
 			return;
 		}
 
-		isValid = value >= 10 && value <= playerData.coins;
+		isValid = value >= 10 && value <= playerData[0].coins;
 	}
 
 	onMount(() => {
@@ -79,7 +79,7 @@
 		for (let i = 0; i < 80; i++) (document.querySelector("#i" + i) as HTMLInputElement).disabled = true;
 		gameOver = true;
 		const earnings = Math.floor(correct * parseInt(bet.value) * 0.5);
-		addCoins(earnings - parseInt(bet.value));
+		UserData.addCoins(earnings - parseInt(bet.value));
 		gameOverText = `You won ${earnings} coins!`;
 	}
 
