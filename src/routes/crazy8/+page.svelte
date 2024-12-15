@@ -146,12 +146,6 @@
 	<Card style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />
 	<div id="deck">
 		{#each cards[currentTurn] as card, index (index)}
-			<!--
-				z-index: {card.suit != lastCard.suit && card.rank != lastCard.rank ? 1 : 2};
-				in:scale={{duration: 250, easing: backOut}}
-				out:fly={{duration: 250, easing: expoIn, y: 200}}
-				in:fly={{duration: 250, easing: expoOut, y: 200}}
-			-->
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div

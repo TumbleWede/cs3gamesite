@@ -41,8 +41,8 @@
 	function createUser() {
 		try {
 			checkValidUsername(newUserInput.value);
-			UserData.value.push({username: newUserInput.value, coins: 0});
-			UserData.setUsername(newUserInput.value);
+			UserData.value.unshift({username: newUserInput.value, coins: 0});
+			UserData.sync();
 			invalidMessage2 = "Username successfully changed!";
 			invalidColor2 = "green";
 		} catch (e) {
