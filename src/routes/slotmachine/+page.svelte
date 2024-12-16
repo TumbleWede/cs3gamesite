@@ -23,7 +23,7 @@
 		for (let i = 0; i < 30; i++) {
 			for (let j = 0; j < indices.length; j++)
 				if (i < 5 * j + 20)
-				indices[j] = (indices[j] + 1) % list.length;
+				indices[j] = (indices[j] + 1) % list.length; // Real slot machines spin in a cycle rather than randomly chosen symbols.
 			await new Promise(resolve => setTimeout(resolve, i * 5 + 10)); // Yields the script for a small interval of time
 		}
 

@@ -16,7 +16,7 @@
 		{ rank: "wild", suit: "green" },
 		{ rank: "wild", suit: "blue" },
 	]
-	let gameContainer: HTMLDivElement;
+	let gameContainer: HTMLDivElement = $state();
 	let lastCard = $state(deck.drawNextCard());
 	let isWild = $state(false);
 	let wildCardSpread = $state(0);
@@ -26,7 +26,8 @@
 	let reward = $state(0);
 	let rotation = 1;
 	let cardDivs: HTMLDivElement[] = $state([]);
-	let currentPlayerTag: HTMLParagraphElement;
+	let currentPlayerTag: HTMLParagraphElement = $state();
+	let debounce = false; // To prevent selecting cards during play animation
 
 	// Replication issues occur when the server tries to execute the setup of the game
 	if (browser) {
@@ -72,7 +73,7 @@
 
 	async function playCard(index: number) {
 		const card = cards[currentTurn][index];
-		if (card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank) return;
+		if (debounce || card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank) return;
 
 		const cardDiv = cardDivs[index];
 		const rect = cardDiv.getBoundingClientRect();
@@ -80,6 +81,7 @@
 		
 		// Animate card from grid to deck
 		cardDiv.setAttribute("data-animating", "true");
+		debounce = true;
 		const animation = cardDiv.animate([
 			{ opacity: 1, transform: "translate(0, 0)" },
 			{ opacity: 1, transform: `translate(${viewportRect.left - rect.left + viewportRect.width * 0.6 - rect.width * 0.5}px, ${viewportRect.top - rect.top + (viewportRect.height - rect.height) * 0.5}px)`},
@@ -88,6 +90,7 @@
 			easing: "ease-out"
 		});
 		await animation.finished;
+		debounce = false;
 		cardDiv.setAttribute("data-animating", "false");
 		lastCard = card;
 		cards[currentTurn].splice(index, 1);

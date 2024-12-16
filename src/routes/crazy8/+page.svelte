@@ -26,6 +26,7 @@
 	let reward = $state(0);
 	let cardDivs: HTMLDivElement[] = $state([]);
 	let currentPlayerTag: HTMLParagraphElement = $state();
+	let debounce = false; // To prevent selecting cards during play animation
 
 	// Replication issues occur when the server tries to execute the setup of the game
 	if (browser) {
@@ -59,11 +60,12 @@
 		animation.onfinish = () => cardDiv.setAttribute("data-animating", "false");
 
 		for (let i = 0; i < cardDivs.length - 1; i++) {
+			if (!cardDivs[i] || !positions[i]) continue; // Ignore null values
 			cardDivs[i].animate([
 				{ transform: `translate(${positions[i].left - cardDivs[i].getBoundingClientRect().left}px, 0)` },
 				{ transform: "translate(0, 0)" }
 			], {
-				duration: 150,
+				duration: 250,
 				easing: "ease-out"
 			});
 		}
@@ -71,7 +73,7 @@
 
 	async function playCard(index: number) {
 		const card = cards[currentTurn][index];
-		if (card.suit != lastCard.suit && card.rank != lastCard.rank) return;
+		if (debounce || card.suit != lastCard.suit && card.rank != lastCard.rank) return;
 
 		const cardDiv = cardDivs[index];
 		const rect = cardDiv.getBoundingClientRect();
@@ -79,14 +81,16 @@
 		
 		// Animate card from grid to deck
 		cardDiv.setAttribute("data-animating", "true");
+		debounce = true;
 		const animation = cardDiv.animate([
 			{ opacity: 1, transform: "translate(0, 0)" },
-			{ opacity: 1, transform: `translate(${viewportRect.left - rect.left + viewportRect.width * 0.6 - rect.width * 0.5}px, ${viewportRect.top - rect.top + (viewportRect.height - rect.height) * 0.5}px)`},
+			{ opacity: 1, transform: `translate(${viewportRect.left - rect.left + viewportRect.width * 0.6 - rect.width * 0.5}px, calc(${viewportRect.top - rect.top + (viewportRect.height - rect.height) * 0.5}px + 5%))`},
 		], {
 			duration: 250,
 			easing: "ease-out"
 		});
 		await animation.finished;
+		debounce = false;
 		cardDiv.setAttribute("data-animating", "false");
 		lastCard = card;
 		cards[currentTurn].splice(index, 1);
@@ -141,6 +145,7 @@
 	const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 	const ranks = ["ace", 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "queen", "king"];
 
+	// Based on https://svelte.dev/playground/64b6e15234594119a73ec45513674fca?version=5.14.0 (rickroll warning)
 	function preload() {
 		return new Promise(async resolve => {
 			await new Promise(resolve => {
