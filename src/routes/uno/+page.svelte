@@ -61,6 +61,7 @@
 		animation.onfinish = () => cardDiv.setAttribute("data-animating", "false");
 
 		for (let i = 0; i < cardDivs.length - 1; i++) {
+			if (!cardDivs[i] || !positions[i]) continue; // Ignore null values
 			cardDivs[i].animate([
 				{ transform: `translate(${positions[i].left - cardDivs[i].getBoundingClientRect().left}px, 0)` },
 				{ transform: "translate(0, 0)" }
@@ -117,7 +118,7 @@
 				isWild = true;
 				wildCardSpread = 1;
 				wildCardVisible = 1;
-				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+				rotation = Math.sign(rotation) * 2;
 				cards[currentTurn].push(deck.drawNextCard());
 				cards[currentTurn].push(deck.drawNextCard());
 				cards[currentTurn].push(deck.drawNextCard());
@@ -127,7 +128,7 @@
 				rotation *= -1;
 				break;
 			case "plus2":
-				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+				rotation = Math.sign(rotation) * 2;
 				cards[currentTurn].push(deck.drawNextCard());
 				cards[currentTurn].push(deck.drawNextCard());
 				break;
@@ -136,7 +137,10 @@
 				break;
 		}
 
-		if (!isWild) currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+		if (!isWild) {
+			currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+			rotation = Math.sign(rotation);
+		}
 	}
 
 	// suit here is the index, not the name of the suit
@@ -145,7 +149,8 @@
 		lastCard = wildCards[suit];
 		isWild = false;
 		wildCardSpread = 0;
-		currentTurn = (currentTurn + 1) % cards.length;
+		currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+		rotation = Math.sign(rotation);
 		// Wait until animation finishes before hiding the eights cards again
 		await new Promise(response => setTimeout(response, 250));
 		wildCardVisible = 0;
