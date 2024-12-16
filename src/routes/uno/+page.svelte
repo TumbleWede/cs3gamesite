@@ -215,13 +215,17 @@
 			</div>
 		{/each}
 	</div>
-	{#if !isWild}
+	{#if !isWild && !gameOver}
 	<div id="spectators">
 		{#each cards as userCards, i}
 			<div class="deck-other">
-				{#each userCards as _, index}
-					<UnoCard face={false} style="scale: 0.5; left: 50%; transform: translate({(index / (userCards.length - 1) - 0.5) * 50}%, -50%) rotateZ({(index / (userCards.length - 1) - 0.5) * 30}deg);" />
-				{/each}
+				{#if userCards.length == 1}
+					<UnoCard face={false} style="scale: 0.5; left: 50%; transform: translate(0%, -50%);" />
+				{:else}
+					{#each userCards as _, index}
+						<UnoCard face={false} style="scale: 0.5; left: 50%; transform: translate({(index / (userCards.length - 1) - 0.5) * 50}%, -50%) rotateZ({(index / (userCards.length - 1) - 0.5) * 30}deg);" />
+					{/each}
+				{/if}
 				<p style="top: {i % 2 == 0 ? 130 : -30}%;">{UserData.value[i].username}</p>
 			</div>
 		{/each}
