@@ -36,6 +36,7 @@
 	.card {
 		width: 15%;
 		aspect-ratio: calc(2.5 / 3.5);
+		border-radius: 4px;
 		box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 		image-rendering: pixelated;
 		margin: 0;

@@ -1,19 +1,15 @@
-// Written by ChatGPT because I'm tired.
-export interface CardData { rank: number, suit: string } // This part written by me though cause I actually understand what this code is doing
-export class Deck {
+export interface CardData { rank: any, suit: string } // rank is any because string | number upsets the typechecker
+
+// Mostly created by ChatGPT
+class CardDeck {
 	public cards: CardData[];
 	private currentIndex: number;
 
-	constructor() {
-		// Define a standard deck of 52 cards
-		const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-		const ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-
-		// Create the deck of cards as strings like '2 of hearts', 'A of spades', etc.
+	constructor(suits: string[], ranks: any[]) {
 		this.cards = [];
 		for (const suit of suits) {
 			for (const rank of ranks) {
-				this.cards.push({ rank, suit });
+				this.cards.push({ rank: rank, suit: rank == "wild" || rank == "plus4" ? "black" : suit });
 			}
 		}
 
@@ -45,5 +41,23 @@ export class Deck {
 	// Check if the deck has cards remaining
 	public hasCards(): boolean {
 		return this.currentIndex < this.cards.length;
+	}
+}
+
+export class Deck extends CardDeck {
+	constructor() {
+		super(
+			['hearts', 'diamonds', 'clubs', 'spades'],
+			[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+		);
+	}
+}
+
+export class UnoDeck extends CardDeck {
+	constructor() {
+		super(
+			['red', 'gold', 'green', 'blue'],
+			[0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, "reverse", "reverse", "skip", "skip", "plus2", "plus2", "plus4", "wild"]
+		);
 	}
 }

@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
-	import Card from "$lib/components/Card.svelte";
-	import { Deck, type CardData } from "$lib/Deck";
+	import UnoCard from "$lib/components/UnoCard.svelte";
+	import { UnoDeck, type CardData } from "$lib/Deck";
 	import { UserData } from "$lib/UserData";
 	import { tick } from "svelte";
 
 	let playerData: UserData[] = $state();
 	UserData.subscribe(value => { playerData = value; });
 
-	const deck = new Deck();
+	const deck = new UnoDeck();
 	const cards: CardData[][] = $state([]);
 	const wildCards: CardData[] = [
-		{ rank: 8, suit: "clubs" },
-		{ rank: 8, suit: "diamonds" },
-		{ rank: 8, suit: "hearts" },
-		{ rank: 8, suit: "spades" },
+		{ rank: "wild", suit: "red" },
+		{ rank: "wild", suit: "gold" },
+		{ rank: "wild", suit: "green" },
+		{ rank: "wild", suit: "blue" },
 	]
 	let gameContainer: HTMLDivElement;
 	let lastCard = $state(deck.drawNextCard());
@@ -24,6 +24,7 @@
 	let currentTurn = $state(0);
 	let gameOver = $state(false);
 	let reward = $state(0);
+	let rotation = 1;
 	let cardDivs: HTMLDivElement[] = $state([]);
 	let currentPlayerTag: HTMLParagraphElement;
 
@@ -71,7 +72,7 @@
 
 	async function playCard(index: number) {
 		const card = cards[currentTurn][index];
-		if (card.suit != lastCard.suit && card.rank != lastCard.rank) return;
+		if (card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank) return;
 
 		const cardDiv = cardDivs[index];
 		const rect = cardDiv.getBoundingClientRect();
@@ -101,13 +102,38 @@
 			return;
 		}
 
-		isWild = lastCard.rank == 8
-		if (isWild) {
-			wildCardSpread = 1;
-			wildCardVisible = 1;
-		} else { // Switch to next person if not wild card card
-			currentTurn = (currentTurn + 1) % cards.length;
-		} 
+		isWild = false;
+
+		switch (lastCard.rank) {
+			case "wild":
+				isWild = true;
+				wildCardSpread = 1;
+				wildCardVisible = 1;
+				break;
+			case "plus4":
+				isWild = true;
+				wildCardSpread = 1;
+				wildCardVisible = 1;
+				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+				cards[currentTurn].push(deck.drawNextCard());
+				cards[currentTurn].push(deck.drawNextCard());
+				cards[currentTurn].push(deck.drawNextCard());
+				cards[currentTurn].push(deck.drawNextCard());
+				break;
+			case "reverse":
+				rotation *= -1;
+				break;
+			case "plus2":
+				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+				cards[currentTurn].push(deck.drawNextCard());
+				cards[currentTurn].push(deck.drawNextCard());
+				break;
+			case "skip":
+				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+				break;
+		}
+
+		if (!isWild) currentTurn = (currentTurn + rotation + cards.length) % cards.length;
 	}
 
 	// suit here is the index, not the name of the suit
@@ -133,43 +159,39 @@
 
 		isWild = false;
 		currentTurn = 0;
+		rotation = 1;
 		reward = 0;
 		gameOver = false;
 	}
-
-	$effect(() => {
-		console.log(`background: hsv(${currentTurn * 360 / UserData.value.length}, 100%, 75%);`);
-	})
 </script>
 
-<h1>Crazy Eights</h1>
-<!-- Colored background helps distinguish who's turn it is -->
+<h1>Uno</h1>
 <div id="game" bind:this={gameContainer} style="background: hsl({currentTurn * 360 / UserData.value.length}, 100%, 95%);">
-	<Card style="top: 50%; left: 40%; cursor: pointer;" face={false} onclick={drawCard} />
-	<Card style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />
+	<UnoCard style="top: 50%; left: 40%; cursor: pointer;" face={false} onclick={drawCard} />
+	<UnoCard style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />
 	<div id="deck">
-		{#each cards[currentTurn] as card, index}
+		{#each cards[currentTurn] as card, index (index)}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class="card-container"
 				style="margin: 0 {Math.min(41.5 / (cards[currentTurn].length - 1) - 7.5, 0.5)}%;"
 				onclick={() => !isWild && playCard(index)}
-				data-disabled={card.suit != lastCard.suit && card.rank != lastCard.rank}
+				data-disabled={card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank}
 				data-animating="false"
 				bind:this={cardDivs[index]}
 			>
 				<!-- How I determined the spacing: https://www.desmos.com/calculator/c3r1sucwy4 -->
-				<Card suit={card.suit} rank={card.rank} style="position: static; width: 100%; height: 100%;" />
+				<UnoCard suit={card.suit} rank={card.rank} style="position: static; width: 100%; height: 100%;" />
 			</div>
 		{/each}
 	</div>
 	{#if isWild}<p style="left: 50%; top: 3%; width: 100%">Choose a suit</p>{/if}
 	<div id="wild-cards" style="top: {36.875 - 30 * wildCardSpread}%; opacity: {wildCardVisible}">
-		<Card onclick={() => chooseWildCard(0)} style="left: {52.5 - 40 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "clubs" ? 1 : 0}" suit="clubs" rank={8} />
-		<Card onclick={() => chooseWildCard(1)} style="left: {52.5 - 20 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "diamonds" ? 1 : 0}" suit="diamonds" rank={8} />
-		<Card onclick={() => chooseWildCard(2)} style="left: {52.5}%;						transform: translate(0, 0); z-index: {lastCard.suit == "hearts" ? 1 : 0}" suit="hearts" rank={8} />
-		<Card onclick={() => chooseWildCard(3)} style="left: {52.5 + 20 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "spades" ? 1 : 0}" suit="spades" rank={8} />
+		<UnoCard onclick={() => chooseWildCard(0)} style="left: {52.5 - 40 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "red" ? 1 : 0}" suit="red" rank="wild" />
+		<UnoCard onclick={() => chooseWildCard(1)} style="left: {52.5 - 20 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "gold" ? 1 : 0}" suit="gold" rank="wild" />
+		<UnoCard onclick={() => chooseWildCard(2)} style="left: {52.5}%;					   transform: translate(0, 0); z-index: {lastCard.suit == "green" ? 1 : 0}" suit="green" rank="wild" />
+		<UnoCard onclick={() => chooseWildCard(3)} style="left: {52.5 + 20 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "blue" ? 1 : 0}" suit="blue" rank="wild" />
 	</div>
 	<p bind:this={currentPlayerTag} style="left: 50%; top: 96%; width: 100%; font-size: 32px;">{playerData[currentTurn].username}'s Turn</p>
 	{#if gameOver}

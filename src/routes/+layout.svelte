@@ -18,6 +18,7 @@
 		<NavButton to="slotmachine" text="Slot Machine" />
 		<NavButton to="keno" text="Keno" />
 		<NavButton to="crazy8" text="Crazy Eights" />
+		<NavButton to="uno" text="Uno" />
 	</div>
 	<div id="navstats">
 		<p style="font-size: 18px;">{playerData[0].username} </p>

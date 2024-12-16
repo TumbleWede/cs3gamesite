@@ -11,13 +11,11 @@ export class UserData {
 	static value: UserData[] = [{ username: "Server", coins: 0 }];
 	private static valueWritable = writable(UserData.value);
 	static subscribe = this.valueWritable.subscribe; // So we can say UserData.subscribe instead of UserData.userdataWritable.subscribe
-
 	static initialize() {
 		if (!browser) return;
 		UserData.value = JSON.parse(localStorage.getItem("value") || '[{"username":"Guest","coins":0}]');
 		UserData.valueWritable.set(UserData.value);
 	}
-
 	static setUsername(value: string) {
 		UserData.value[0].username = value;
 		UserData.sync();
