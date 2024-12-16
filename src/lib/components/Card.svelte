@@ -52,6 +52,5 @@
 		height: 100%;
 		border-radius: 4px;
 		display: block;
-		perspective: 1000px;
 	}
 </style>

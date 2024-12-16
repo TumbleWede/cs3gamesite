@@ -4,6 +4,7 @@
 	import { Deck, type CardData } from "$lib/Deck";
 	import { UserData } from "$lib/UserData";
 	import { tick } from "svelte";
+    import { fade } from "svelte/transition";
 
 	let playerData: UserData[] = $state();
 	UserData.subscribe(value => { playerData = value; });
@@ -195,6 +196,18 @@
 			</div>
 		{/each}
 	</div>
+	{#if !isWild}
+	<div id="spectators">
+		{#each cards as userCards, i}
+			<div class="deck-other">
+				{#each userCards as _, index}
+					<Card face={false} style="scale: 0.5; left: 50%; transform: translate({(index / (userCards.length - 1) - 0.5) * 50}%, -50%) rotateZ({(index / (userCards.length - 1) - 0.5) * 30}deg);" />
+				{/each}
+				<p style="top: {i % 2 == 0 ? 130 : -30}%;">{UserData.value[i].username}</p>
+			</div>
+		{/each}
+	</div>
+	{/if}
 	{#if isWild}<p style="left: 50%; top: 3%; width: 100%">Choose a suit</p>{/if}
 	<div id="wild-cards" style="top: {36.875 - 30 * wildCardSpread}%; opacity: {wildCardVisible}">
 		<Card onclick={() => chooseWildCard(0)} style="left: {52.5 - 40 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "clubs" ? 1 : 0}" suit="clubs" rank={8} />
@@ -245,6 +258,37 @@
 		bottom: 7.5%;
 		justify-content: center;
 		transition: 0.2s;
+	}
+
+	#spectators {
+		display: flex;
+		width: 100%;
+		position: absolute;
+		top: 10%;
+		justify-content: center;
+		height: 13.125%;
+	}
+
+	.deck-other {
+		position: relative;
+		display: block;
+		width: 100%;
+		max-width: 20%;
+		transform: translate(-50%, 0);
+		height: 100%;
+	}
+
+	.deck-other > :global(.card) {
+		width: 100%;
+	}
+
+	.deck-other > p {
+		width: 100%;
+		margin: auto;
+		left: 100%;
+		color: black;
+		font-weight: bold;
+		z-index: 1;
 	}
 
 	.card-container {

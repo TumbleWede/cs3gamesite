@@ -118,19 +118,19 @@
 				isWild = true;
 				wildCardSpread = 1;
 				wildCardVisible = 1;
+				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
+				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
+				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
+				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
 				rotation = Math.sign(rotation) * 2;
-				cards[currentTurn].push(deck.drawNextCard());
-				cards[currentTurn].push(deck.drawNextCard());
-				cards[currentTurn].push(deck.drawNextCard());
-				cards[currentTurn].push(deck.drawNextCard());
 				break;
 			case "reverse":
 				rotation *= -1;
 				break;
 			case "plus2":
+				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
+				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
 				rotation = Math.sign(rotation) * 2;
-				cards[currentTurn].push(deck.drawNextCard());
-				cards[currentTurn].push(deck.drawNextCard());
 				break;
 			case "skip":
 				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
@@ -215,6 +215,18 @@
 			</div>
 		{/each}
 	</div>
+	{#if !isWild}
+	<div id="spectators">
+		{#each cards as userCards, i}
+			<div class="deck-other">
+				{#each userCards as _, index}
+					<UnoCard face={false} style="scale: 0.5; left: 50%; transform: translate({(index / (userCards.length - 1) - 0.5) * 50}%, -50%) rotateZ({(index / (userCards.length - 1) - 0.5) * 30}deg);" />
+				{/each}
+				<p style="top: {i % 2 == 0 ? 130 : -30}%;">{UserData.value[i].username}</p>
+			</div>
+		{/each}
+	</div>
+	{/if}
 	{#if isWild}<p style="left: 50%; top: 3%; width: 100%">Choose a suit</p>{/if}
 	<div id="wild-cards" style="top: {36.875 - 30 * wildCardSpread}%; opacity: {wildCardVisible}">
 		<UnoCard onclick={() => chooseWildCard(0)} style="left: {52.5 - 40 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "red" ? 1 : 0}" suit="red" rank="wild" />
@@ -265,6 +277,37 @@
 		bottom: 7.5%;
 		justify-content: center;
 		transition: 0.2s;
+	}
+
+	#spectators {
+		display: flex;
+		width: 100%;
+		position: absolute;
+		top: 10%;
+		justify-content: center;
+		height: 13.125%;
+	}
+
+	.deck-other {
+		position: relative;
+		display: block;
+		width: 100%;
+		max-width: 20%;
+		transform: translate(-50%, 0);
+		height: 100%;
+	}
+
+	.deck-other > :global(.card) {
+		width: 100%;
+	}
+
+	.deck-other > p {
+		width: 100%;
+		margin: auto;
+		left: 100%;
+		color: black;
+		font-weight: bold;
+		z-index: 1;
 	}
 
 	.card-container {

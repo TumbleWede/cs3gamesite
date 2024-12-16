@@ -21,7 +21,7 @@
 	// You = true, dealer = false
 	function getValue(rank: number, turn: boolean): number {
 		if (rank > 1) return Math.min(rank, 10); // Do not exceed 10
-		return (turn ? dealerScore : youScore) >= 10 ? 1 : 11;
+		return (turn ? youScore : dealerScore) > 10 ? 1 : 11;
 	}
 	
 	function hit() {
@@ -69,7 +69,6 @@
 		dealerScore = getValue(dealerCards[1].rank, false);
 		gameOver = false;
 		gameOverText = "";
-
 		if (youScore == 21) stand();
 	}
 </script>
@@ -112,7 +111,7 @@
 			</div>
 		{/each}
 	</div>
-
+	
 	<p style="top: 3%; left: 50%;">Dealer ({dealerScore})</p>
 	<p style="top: 97%; left: 50%;">{playerData[0].username} ({youScore})</p>
 	<button style="top: 45%; left: 50%;" onclick={hit} disabled={gameOver ? true : null}>Hit</button>

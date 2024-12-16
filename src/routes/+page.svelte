@@ -62,6 +62,7 @@
 <div id="username">
 	<h2>Welcome, {playerData[0].username}!</h2>
 	<h2>You have {playerData[0].coins} coins</h2><br/>
+	<p>Made by Brandon Thames & Aryan Rajpal</p>
 	<p>Play <a href="highcard">High Card</a> to earn coins for gambling</p>
 	<p>Please check out <a href="crazy8">Crazy Eights</a>, our best game to offer! (ChatGPT could never cook this one up)</p>
 	<p>In <a href="crazy8">Crazy Eights</a> and <a href="uno">Uno</a>, the users listed below are the players.</p>
