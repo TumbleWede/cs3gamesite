@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HTMLAttributes } from "svelte/elements";
+	import { writable } from "svelte/store";
 
 	// Make all parameters optional and give default values so that the card cannot
 	// The extends part is to make the typescript compiler happy for allowing ...others attributes
@@ -10,6 +11,7 @@
 		face?: boolean
 	}
 	let { suit = "joker", rank = 1, invert = false, face = true, ...others }: Props = $props();
+	let card: HTMLDivElement;
 
 	let displayRank = $derived.by(() => {
 		switch (rank) {
@@ -28,7 +30,7 @@
 </script>
 
 
-<div {...others} class="card {"class" in others ? others.class : ''}">
+<div bind:this={card} {...others} class="card {"class" in others ? others.class : ''}">
 	<img src="{src}" alt="{suit} {rank}"/>
 </div>
 
@@ -50,5 +52,6 @@
 		height: 100%;
 		border-radius: 4px;
 		display: block;
+		perspective: 1000px;
 	}
 </style>

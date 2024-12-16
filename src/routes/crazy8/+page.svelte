@@ -239,9 +239,9 @@
 
 	#deck {
 		position: absolute;
-        width: 100%;
-        height: 26.25%;
-        display: flex;
+		width: 100%;
+		height: 26.25%;
+		display: flex;
 		bottom: 7.5%;
 		justify-content: center;
 		transition: 0.2s;
