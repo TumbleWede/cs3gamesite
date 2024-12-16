@@ -163,9 +163,30 @@
 		reward = 0;
 		gameOver = false;
 	}
+
+	let preloadProgress = $state(0);
+	const ranks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "reverse", "skip", "plus2", "plus4", "wild", "wildred", "wildgold", "wildgreen", "wildblue", "back"];
+
+	function preload() {
+		return new Promise(async resolve => {
+			for (const rank of ranks) {
+				await new Promise(resolve => {
+					const img = new Image();
+					img.onload = resolve;
+					img.src = `unocards/${rank}.svg`;
+				});
+				preloadProgress++;
+			}
+			resolve(null);
+		});
+	}
 </script>
 
 <h1>Uno</h1>
+{#if browser}
+{#await preload()}
+<h1>Loading assets... ({preloadProgress}/{ranks.length})</h1>
+{:then _}
 <div id="game" bind:this={gameContainer} style="background: hsl({currentTurn * 360 / UserData.value.length}, 100%, 95%);">
 	<UnoCard style="top: 50%; left: 40%; cursor: pointer;" face={false} onclick={drawCard} />
 	<UnoCard style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />
@@ -200,6 +221,7 @@
 		<button style="top: 25%" onclick={reset}>Play Again</button>
 	{/if}
 </div>
+{/await}{/if}
 
 <style>
 	#game p, button {

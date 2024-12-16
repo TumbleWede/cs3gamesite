@@ -53,7 +53,6 @@
 
 	function deleteUser(index: number) {
 		const confirmed = confirm(`Are you sure you want to delete user '${UserData.value[index].username}'?\nYou can't undo this operation.`);
-		console.log(confirmed);
 		if (!confirmed) return;
 		UserData.removeUser(index);
 	}
@@ -61,19 +60,21 @@
 
 <h1>Home</h1>
 <div id="username">
-	<p>Welcome, {playerData[0].username}!</p>
-	<p>You have {playerData[0].coins} coins</p><br/>
-	<p>Play <a href="highcard">High Card</a> to earn coins</p>
-	<p>Play other games to gamble!</p>
+	<h2>Welcome, {playerData[0].username}!</h2>
+	<h2>You have {playerData[0].coins} coins</h2><br/>
+	<p>Play <a href="highcard">High Card</a> to earn coins for gambling</p>
+	<p>Please check out <a href="crazy8">Crazy Eights</a>, our best game to offer! (ChatGPT could never cook this one up)</p>
+	<p>In <a href="crazy8">Crazy Eights</a> and <a href="uno">Uno</a>, the users listed below are the players.</p>
+	<p>The rest of the games are just single player with the currently selected user</p>
 	<br/><br/>
 
-	<p>Change Username:</p>
+	<h2>Change Username:</h2>
 	<input bind:this={input} type="text" value="{playerData[0].username}" maxlength="20" />
 	<button onclick={changeUsername}>Save</button>
 	<p style="font-size: 18px; color: {invalidColor};">{invalidMessage}</p>
 	<br/><br/>
 
-	<p>Switch User:</p>
+	<h2>Switch User:</h2>
 	{#each playerData as user, index}
 	    {#if user.username != playerData[0].username}
 			<div class="user">
@@ -90,7 +91,12 @@
 
 <style>
 	p {
-		font-size: 32px;
+		font-size: 18px;
+		margin: 10px;
+	}
+
+	h2 {
+		font-size: 24px;
 		margin: 10px;
 	}
 

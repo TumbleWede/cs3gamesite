@@ -16,7 +16,7 @@
 		{ rank: 8, suit: "hearts" },
 		{ rank: 8, suit: "spades" },
 	]
-	let gameContainer: HTMLDivElement;
+	let gameContainer: HTMLDivElement = $state();
 	let lastCard = $state(deck.drawNextCard());
 	let isWild = $state(false);
 	let wildCardSpread = $state(0);
@@ -25,7 +25,7 @@
 	let gameOver = $state(false);
 	let reward = $state(0);
 	let cardDivs: HTMLDivElement[] = $state([]);
-	let currentPlayerTag: HTMLParagraphElement;
+	let currentPlayerTag: HTMLParagraphElement = $state();
 
 	// Replication issues occur when the server tries to execute the setup of the game
 	if (browser) {
@@ -137,12 +137,38 @@
 		gameOver = false;
 	}
 
-	$effect(() => {
-		console.log(`background: hsv(${currentTurn * 360 / UserData.value.length}, 100%, 75%);`);
-	})
+	let preloadProgress = $state(0);
+	const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+	const ranks = ["ace", 2, 3, 4, 5, 6, 7, 8, 9, 10, "jack", "queen", "king"];
+
+	function preload() {
+		return new Promise(async resolve => {
+			await new Promise(resolve => {
+				const img = new Image();
+				img.onload = resolve;
+				img.src = `/cards/back1.GIF`;
+			});
+
+			for (const suit of suits) {
+				for (const rank of ranks) {
+					await new Promise(resolve => {
+						const img = new Image();
+						img.onload = resolve;
+						img.src = `/cards/${rank}${suit}.GIF`;
+					});
+					preloadProgress++;
+				}
+			}
+			resolve(null);
+		});
+	}
 </script>
 
 <h1>Crazy Eights</h1>
+{#if browser}
+{#await preload()}
+<h1>Loading assets... ({preloadProgress}/{suits.length * ranks.length})</h1>
+{:then _}
 <!-- Colored background helps distinguish who's turn it is -->
 <div id="game" bind:this={gameContainer} style="background: hsl({currentTurn * 360 / UserData.value.length}, 100%, 95%);">
 	<Card style="top: 50%; left: 40%; cursor: pointer;" face={false} onclick={drawCard} />
@@ -178,6 +204,7 @@
 		<button style="top: 25%" onclick={reset}>Play Again</button>
 	{/if}
 </div>
+{/await}{/if}
 
 <style>
 	#game p, button {
