@@ -21,7 +21,7 @@
 		<NavButton to="uno" text="Uno" />
 	</div>
 	<div id="navstats">
-		<p style="font-size: 18px;">{playerData[0].username} </p>
+		<p style="font-size: 18px; word-wrap: break-word;">{playerData[0].username} </p>
 		<p>Coins: {playerData[0].coins} </p>
 	</div>
 </nav>
@@ -35,7 +35,6 @@
 		width: 200px;
 		height: 100vh;
 		background: linear-gradient(180deg, rgb(5, 39, 103) 0%, rgb(6, 71, 18) 80%);
-		position: static;
 	}
 
 	.container {
@@ -48,7 +47,6 @@
 		font-size: 24px;
 		margin: 10px 0;
 		width: 200px;
-		font-family: monospace;
 	}
 
 	#navstats {

@@ -4,7 +4,6 @@
 	import { Deck, type CardData } from "$lib/Deck";
 	import { UserData } from "$lib/UserData";
 	import { tick } from "svelte";
-    import { fade } from "svelte/transition";
 
 	let playerData: UserData[] = $state();
 	UserData.subscribe(value => { playerData = value; });
@@ -207,7 +206,7 @@
 						<Card face={false} style="scale: 0.5; left: 50%; transform: translate({(index / (userCards.length - 1) - 0.5) * 50}%, -50%) rotateZ({(index / (userCards.length - 1) - 0.5) * 30}deg);" />
 					{/each}
 				{/if}
-				<p style="top: {i % 2 == 0 ? 130 : -30}%;">{UserData.value[i].username}</p>
+				<p style="top: {i % 2 == 0 ? 130 : -30}%; color: hsl({i * 360 / UserData.value.length}, 100%, 75%)">{UserData.value[i].username}</p>
 			</div>
 		{/each}
 	</div>
@@ -219,7 +218,7 @@
 		<Card onclick={() => chooseWildCard(2)} style="left: {52.5}%;						transform: translate(0, 0); z-index: {lastCard.suit == "hearts" ? 1 : 0}" suit="hearts" rank={8} />
 		<Card onclick={() => chooseWildCard(3)} style="left: {52.5 + 20 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "spades" ? 1 : 0}" suit="spades" rank={8} />
 	</div>
-	<p bind:this={currentPlayerTag} style="left: 50%; top: 96%; width: 100%; font-size: 32px;">{playerData[currentTurn].username}'s Turn</p>
+	<p bind:this={currentPlayerTag} style="transition: 0.25s; left: 50%; top: 96%; width: 100%; font-size: 32px; color: hsl({currentTurn * 360 / UserData.value.length}, 100%, 25%);">{playerData[currentTurn].username}'s Turn</p>
 	{#if gameOver}
 		<p id="gameover-text" style="left: 50%; top: 10%; width: 100%; font-size: 50px;">{playerData[currentTurn].username} Won!</p>
 		<p style="left: 50%; top: 15%;">+{reward} coins rewarded</p>
@@ -292,7 +291,8 @@
 		left: 100%;
 		color: black;
 		font-weight: bold;
-		z-index: 1;
+		-webkit-text-stroke: 1px black;
+		word-wrap: break-word;
 	}
 
 	.card-container {

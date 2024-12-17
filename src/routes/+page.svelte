@@ -60,13 +60,13 @@
 
 <h1>Home</h1>
 <div id="username">
-	<h2>Welcome, {playerData[0].username}!</h2>
+	<h2>Welcome, <span style="background-image: linear-gradient(45deg, rgb(5, 39, 103) 0%, rgb(6, 71, 18) 80%);">{playerData[0].username}</span>!</h2>
 	<h2>You have {playerData[0].coins} coins</h2><br/>
-	<p>Made by Brandon Thames & Aryan Rajpal</p>
+	<p>Made by <span style="font-weight: bold; background-image: linear-gradient(75deg, #08c 0%, #093 80%);">Brandon Thames</span> & <span style="font-weight: bold; background-image: linear-gradient(75deg, red 0%, #900 80%);">Aryan Rajpal</span></p>
 	<p>Play <a href="highcard">High Card</a> to earn coins for gambling</p>
 	<p>Please check out <a href="crazy8">Crazy Eights</a>, our best game to offer! (ChatGPT could never cook this one up)</p>
 	<p>In <a href="crazy8">Crazy Eights</a> and <a href="uno">Uno</a>, the users listed below are the players.</p>
-	<p>The rest of the games are just single player with the currently selected user</p>
+	<p>The rest of the games are just single player with the currently selected user.</p>
 	<br/><br/>
 
 	<h2>Change Username:</h2>
@@ -111,5 +111,10 @@
 
 	.user {
 		margin: 10px;
+	}
+
+	span {
+		color: transparent;
+		background-clip: text;
 	}
 </style>

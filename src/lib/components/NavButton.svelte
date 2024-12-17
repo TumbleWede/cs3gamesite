@@ -27,5 +27,6 @@
 		height: 100%;
 		display: block;
 		align-content: center;
+		font-family: Rubik;
 	}
 </style>

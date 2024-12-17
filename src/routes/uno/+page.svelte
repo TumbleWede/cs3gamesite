@@ -28,6 +28,7 @@
 	let cardDivs: HTMLDivElement[] = $state([]);
 	let currentPlayerTag: HTMLParagraphElement = $state();
 	let debounce = false; // To prevent selecting cards during play animation
+	let playerToDraw = $state(0); // So that the victim can watch themselves recieve these cards
 
 	// Replication issues occur when the server tries to execute the setup of the game
 	if (browser) {
@@ -35,6 +36,10 @@
 			cards[i] = [];
 			for (let _ = 0; _ < 7; _++) cards[i].push(deck.drawNextCard());
 		}
+	}
+
+	function nextTurn() {
+		currentTurn = (currentTurn + rotation + cards.length) % cards.length;
 	}
 
 	async function drawCard() {
@@ -70,6 +75,21 @@
 				easing: "ease-out"
 			});
 		}
+	}
+
+	// In case of +2 and +4 cards
+	async function playDrawAnimation() {
+		if (playerToDraw == 0) return;
+		debounce = true;
+		await new Promise(resolve => setTimeout(resolve, 200));
+		for (let i = 0; i < playerToDraw; i++) {
+			drawCard();
+			await new Promise(resolve => setTimeout(resolve, 250));
+		}
+		await new Promise(resolve => setTimeout(resolve, 200));
+		playerToDraw = 0;
+		currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+		debounce = false;
 	}
 
 	async function playCard(index: number) {
@@ -118,28 +138,24 @@
 				isWild = true;
 				wildCardSpread = 1;
 				wildCardVisible = 1;
-				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
-				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
-				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
-				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
-				rotation = Math.sign(rotation) * 2;
+				playerToDraw = 4;
 				break;
 			case "reverse":
-				rotation *= -1;
+				if (cards.length == 2) nextTurn(); // In a 1v1, reverse acts like a skip
+				else rotation *= -1;
 				break;
 			case "plus2":
-				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
-				cards[(currentTurn + rotation + cards.length) % cards.length].push(deck.drawNextCard());
-				rotation = Math.sign(rotation) * 2;
+				playerToDraw = 2;
 				break;
 			case "skip":
-				currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+				nextTurn();
 				break;
 		}
 
 		if (!isWild) {
-			currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+			nextTurn();
 			rotation = Math.sign(rotation);
+			playDrawAnimation();
 		}
 	}
 
@@ -149,11 +165,12 @@
 		lastCard = wildCards[suit];
 		isWild = false;
 		wildCardSpread = 0;
-		currentTurn = (currentTurn + rotation + cards.length) % cards.length;
+		nextTurn();
 		rotation = Math.sign(rotation);
 		// Wait until animation finishes before hiding the eights cards again
 		await new Promise(response => setTimeout(response, 250));
 		wildCardVisible = 0;
+		playDrawAnimation();
 	}
 
 	function reset() {
@@ -226,7 +243,7 @@
 						<UnoCard face={false} style="scale: 0.5; left: 50%; transform: translate({(index / (userCards.length - 1) - 0.5) * 50}%, -50%) rotateZ({(index / (userCards.length - 1) - 0.5) * 30}deg);" />
 					{/each}
 				{/if}
-				<p style="top: {i % 2 == 0 ? 130 : -30}%;">{UserData.value[i].username}</p>
+				<p style="top: {i % 2 == 0 ? 130 : -30}%; color: hsl({i * 360 / UserData.value.length}, 100%, 75%);">{UserData.value[i].username}</p>
 			</div>
 		{/each}
 	</div>
@@ -238,7 +255,7 @@
 		<UnoCard onclick={() => chooseWildCard(2)} style="left: {52.5}%;					   transform: translate(0, 0); z-index: {lastCard.suit == "green" ? 1 : 0}" suit="green" rank="wild" />
 		<UnoCard onclick={() => chooseWildCard(3)} style="left: {52.5 + 20 * wildCardSpread}%; transform: translate(0, 0); z-index: {lastCard.suit == "blue" ? 1 : 0}" suit="blue" rank="wild" />
 	</div>
-	<p bind:this={currentPlayerTag} style="left: 50%; top: 96%; width: 100%; font-size: 32px;">{playerData[currentTurn].username}'s Turn</p>
+	<p bind:this={currentPlayerTag} style="transition: 0.25s; left: 50%; top: 96%; width: 100%; font-size: 32px; color: hsl({currentTurn * 360 / UserData.value.length}, 100%, 25%);">{playerData[currentTurn].username}'s Turn</p>
 	{#if gameOver}
 		<p id="gameover-text" style="left: 50%; top: 10%; width: 100%; font-size: 50px;">{playerData[currentTurn].username} Won!</p>
 		<p style="left: 50%; top: 15%;">+{reward} coins rewarded</p>
@@ -311,7 +328,8 @@
 		left: 100%;
 		color: black;
 		font-weight: bold;
-		z-index: 1;
+		-webkit-text-stroke: 1px black;
+		word-wrap: break-word;
 	}
 
 	.card-container {
