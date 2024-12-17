@@ -28,10 +28,13 @@
 	let cardDivs: HTMLDivElement[] = $state([]);
 	let currentPlayerTag: HTMLParagraphElement = $state();
 	let debounce = false; // To prevent selecting cards during play animation
-	let playerToDraw = $state(0); // So that the victim can watch themselves recieve these cards
+	let cardsToDraw = $state(0); // So that the victim can watch themselves recieve these cards
+	let stackMode = $state(false); // Allows ability to stack cards (not an official rule, but a fun custom feature)
+	let firstCard = $state(true);
 
 	// Replication issues occur when the server tries to execute the setup of the game
 	if (browser) {
+		// Initialize card decks
 		for (let i = 0; i < UserData.value.length; i++) {
 			cards[i] = [];
 			for (let _ = 0; _ < 7; _++) cards[i].push(deck.drawNextCard());
@@ -79,39 +82,51 @@
 
 	// In case of +2 and +4 cards
 	async function playDrawAnimation() {
-		if (playerToDraw == 0) return;
+		if (cardsToDraw == 0) return;
+
+		// Check if the player can stack the cards
+		for (const card of cards[currentTurn]) {
+			if (card.rank == "plus2" || card.rank == "plus4") {
+				return;
+			}
+		}
+
 		debounce = true;
+		stackMode = false;
 		await new Promise(resolve => setTimeout(resolve, 200));
-		for (let i = 0; i < playerToDraw; i++) {
+		const final = cardsToDraw; // So we can animate the cards to draw to 0 without affecting the for loop
+		for (let i = 0; i < final; i++) {
 			drawCard();
+			cardsToDraw--;
 			await new Promise(resolve => setTimeout(resolve, 250));
 		}
 		await new Promise(resolve => setTimeout(resolve, 200));
-		playerToDraw = 0;
+		cardsToDraw = 0;
 		currentTurn = (currentTurn + rotation + cards.length) % cards.length;
 		debounce = false;
 	}
 
 	async function playCard(index: number) {
 		const card = cards[currentTurn][index];
-		if (debounce || card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank) return;
+		if (debounce || stackMode ? (card.rank != "plus2" && card.rank != "plus4") : (!firstCard && card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank)) return;
 
 		const cardDiv = cardDivs[index];
 		const rect = cardDiv.getBoundingClientRect();
 		const viewportRect = gameContainer.getBoundingClientRect();
-		
+
 		// Animate card from grid to deck
-		cardDiv.setAttribute("data-animating", "true");
 		debounce = true;
+		cardDiv.setAttribute("data-animating", "true");
 		const animation = cardDiv.animate([
 			{ opacity: 1, transform: "translate(0, 0)" },
-			{ opacity: 1, transform: `translate(${viewportRect.left - rect.left + viewportRect.width * 0.6 - rect.width * 0.5}px, ${viewportRect.top - rect.top + (viewportRect.height - rect.height) * 0.5}px)`},
+			{ opacity: 1, transform: `translate(${viewportRect.left - rect.left + viewportRect.width * 0.6 - rect.width * 0.5}px, calc(${viewportRect.top - rect.top + (viewportRect.height - rect.height) * 0.5}px + 5%))`},
 		], {
 			duration: 250,
 			easing: "ease-out"
 		});
 		await animation.finished;
 		debounce = false;
+		firstCard = false;
 		cardDiv.setAttribute("data-animating", "false");
 		lastCard = card;
 		cards[currentTurn].splice(index, 1);
@@ -138,14 +153,16 @@
 				isWild = true;
 				wildCardSpread = 1;
 				wildCardVisible = 1;
-				playerToDraw = 4;
+				cardsToDraw += 4;
+				stackMode = true;
 				break;
 			case "reverse":
 				if (cards.length == 2) nextTurn(); // In a 1v1, reverse acts like a skip
 				else rotation *= -1;
 				break;
 			case "plus2":
-				playerToDraw = 2;
+				cardsToDraw += 2;
+				stackMode = true;
 				break;
 			case "skip":
 				nextTurn();
@@ -187,6 +204,7 @@
 		rotation = 1;
 		reward = 0;
 		gameOver = false;
+		firstCard = true;
 	}
 
 	let preloadProgress = $state(0);
@@ -214,7 +232,7 @@
 {:then _}
 <div id="game" bind:this={gameContainer} style="background: hsl({currentTurn * 360 / UserData.value.length}, 100%, 95%);">
 	<UnoCard style="top: 50%; left: 40%; cursor: pointer;" face={false} onclick={drawCard} />
-	<UnoCard style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />
+	{#if !firstCard}<UnoCard style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />{/if}
 	<div id="deck">
 		{#each cards[currentTurn] as card, index (index)}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -223,7 +241,7 @@
 				class="card-container"
 				style="margin: 0 {Math.min(41.5 / (cards[currentTurn].length - 1) - 7.5, 0.5)}%;"
 				onclick={() => !isWild && playCard(index)}
-				data-disabled={card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank}
+				data-disabled={stackMode ? (card.rank != "plus2" && card.rank != "plus4") : (!firstCard && card.rank != "wild" && card.rank != "plus4" && card.suit != lastCard.suit && card.rank != lastCard.rank)}
 				data-animating="false"
 				bind:this={cardDivs[index]}
 			>
@@ -232,6 +250,7 @@
 			</div>
 		{/each}
 	</div>
+	{#if cardsToDraw > 0}<p style="top: 50%; left: 40%; color: white; font-weight: bold; font-size: 64px; -webkit-text-stroke: 3px black;">{cardsToDraw}</p>{/if}
 	{#if !isWild && !gameOver}
 	<div id="spectators">
 		{#each cards as userCards, i}

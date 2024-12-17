@@ -2,7 +2,8 @@
 Made using the Svelte (frontend) & SvelteKit (backend) framework alongside TypeScript (JavaScript but with static types)
 This website was programmed using VS Code, so we would recommend using that instead of Visual Studio to test and evaluate this project
 Check out the (Svelte documentation)[https://svelte.dev/docs/svelte/overview] for more info on Svelte syntax
-This project runs on a Node.JS server, so you need to be able to run this on a computer not blocked by the infamous Frisco Firewall™
+This project runs on a (Node.js)[https://nodejs.org/en] server, so you need to be able to run this on a computer not blocked by the infamous Frisco Firewall™
+To make sure Node.js is properly installed, make sure typing the commands `node` and `npm` both work 
 
 ## Running the server
 Just type `npm run dev` to start the server and open the localhost in your browser (I'm hoping you already have (Node.js)[https://nodejs.org/en] installed)

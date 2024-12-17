@@ -27,6 +27,7 @@
 	let cardDivs: HTMLDivElement[] = $state([]);
 	let currentPlayerTag: HTMLParagraphElement = $state();
 	let debounce = false; // To prevent selecting cards during play animation
+	let firstCard = $state(true);
 
 	// Replication issues occur when the server tries to execute the setup of the game
 	if (browser) {
@@ -73,7 +74,7 @@
 
 	async function playCard(index: number) {
 		const card = cards[currentTurn][index];
-		if (debounce || card.suit != lastCard.suit && card.rank != lastCard.rank) return;
+		if (debounce || !firstCard && card.suit != lastCard.suit && card.rank != lastCard.rank) return;
 
 		const cardDiv = cardDivs[index];
 		const rect = cardDiv.getBoundingClientRect();
@@ -91,6 +92,7 @@
 		});
 		await animation.finished;
 		debounce = false;
+		firstCard = false;
 		cardDiv.setAttribute("data-animating", "false");
 		lastCard = card;
 		cards[currentTurn].splice(index, 1);
@@ -139,6 +141,7 @@
 		currentTurn = 0;
 		reward = 0;
 		gameOver = false;
+		firstCard = true;
 	}
 
 	let preloadProgress = $state(0);
@@ -177,7 +180,7 @@
 <!-- Colored background helps distinguish who's turn it is -->
 <div id="game" bind:this={gameContainer} style="background: hsl({currentTurn * 360 / UserData.value.length}, 100%, 95%);">
 	<Card style="top: 50%; left: 40%; cursor: pointer;" face={false} onclick={drawCard} />
-	<Card style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />
+	{#if !firstCard}<Card style="top: 50%; left: 60%;" suit={lastCard.suit} rank={lastCard.rank} />{/if}
 	<div id="deck">
 		{#each cards[currentTurn] as card, index}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -186,7 +189,7 @@
 				class="card-container"
 				style="margin: 0 {Math.min(41.5 / (cards[currentTurn].length - 1) - 7.5, 0.5)}%;"
 				onclick={() => !isWild && playCard(index)}
-				data-disabled={card.suit != lastCard.suit && card.rank != lastCard.rank}
+				data-disabled={!firstCard && card.suit != lastCard.suit && card.rank != lastCard.rank}
 				data-animating="false"
 				bind:this={cardDivs[index]}
 			>
